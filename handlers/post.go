@@ -68,6 +68,13 @@ func InsertPostHandler(s server.Server) http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+			//Broadcast by websockets
+			var postMessage = models.WebsocketMessage{
+				Type:    "Post_Created",
+				Payload: post,
+			}
+			//Execute the broadcast function
+			s.Hub().Broadcast(postMessage, nil)
 			//Set headers
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(PostResponse{
